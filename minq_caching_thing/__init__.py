@@ -9,7 +9,7 @@ class Minq_caching_thing:
     # static settings
 
     # folders
-    cache_dir = os.path.expanduser('~/.cache/caching-thing')
+    cache_dir = os.path.expanduser('~/.cache/minq-caching-thing')
     hashed_bytes_dir = os.path.join(cache_dir, 'hashes', 'sha512')
     url_associations_dir = os.path.join(cache_dir, 'url-associations')
     # files
@@ -41,9 +41,12 @@ class Minq_caching_thing:
 
     # not statuc functions
 
-    def cache(s, *a, **kw):
-        thr = threading.Thread(target=s._cache_thread, args=a, kwargs=kw)
-        thr.start()
+    def cache(s, *a, blocking=False, **kw):
+        if blocking:
+            return _cache_thread(*a, **kw)
+        else:
+            thr = threading.Thread(target=s._cache_thread, args=a, kwargs=kw)
+            thr.start()
     def _cache_thread(s, data, hash_=None):
         if type(data) == str:
             data = data.encode(s.string_encoder)
@@ -73,13 +76,20 @@ class Minq_caching_thing:
             with open(verification_file, 'w') as f:
                 pass
             os.remove(being_processed_file)
+            return content_file
     
-    def get_cache(s, hash_, read_mode='', return_file_obj=False):
+    def get_cache(s, hash_, return_path=False, return_file_obj=False, read_mode=''):
         hash_dir = os.path.join(s.hashed_bytes_dir, hash_)
         verification_file = os.path.join(hash_dir, s.hash_is_verified_file)
         if not os.path.isfile(verification_file):
             return
         content_file = os.path.join(hash_dir, s.hash_content_file)
+        if return_path:
+            match read_mode:
+                case '': pass
+                case 'b': content_file = content_file.encode()
+                case _: raise # unreachable
+            return content_file
         f = open(content_file, 'r'+read_mode) # what if content_file doesn't exist?
         if return_file_obj:
             return f
@@ -115,7 +125,7 @@ class Minq_caching_thing:
         content_file = os.path.join(url_dir, s.url_content_file)
         with open(content_file, 'r') as f:
             hash_ = f.read()
-        return get_cache(hash_, *a, **kw)
+        return s.get_cache(hash_, *a, **kw)
 
 if __name__ == '__main__':
     print('Running self test')
