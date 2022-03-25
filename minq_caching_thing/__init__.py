@@ -4,7 +4,7 @@ import hashlib
 import threading
 import time
 
-class Caching_thing:
+class Minq_caching_thing:
 
     # static settings
 
@@ -119,7 +119,7 @@ class Caching_thing:
 
 if __name__ == '__main__':
     print('Running self test')
-    ct = Caching_thing()
-    ct.cache('just a simple test')
-    ct.cache_url('test', 'asdfgh')
+    mct = Minq_caching_thing()
+    mct.cache('just a simple test')
+    mct.cache_url('test', 'asdfgh')
     time.sleep(10)
