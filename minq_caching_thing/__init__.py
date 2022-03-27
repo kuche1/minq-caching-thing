@@ -49,12 +49,13 @@ class Minq_caching_thing:
             thr.start()
             return thr
     def _cache_thread(s, data, hash_=None):
-        if type(data) == str:
-            data = data.encode(s.string_encoder)
-        elif type(data) == bytes:
-            pass
-        else:
-            assert False
+        match type(data):
+            case bytes:
+                pass
+            case str:
+                data = data.encode(s.string_encoder)
+            case _:
+                assert False
         if hash_ == None:
             hash_ = s.get_bytes_hash(data)
         hash_dir = os.path.join(s.hashed_bytes_dir, hash_)
@@ -99,8 +100,8 @@ class Minq_caching_thing:
         with f as f:
             return f.read()
     
-    def cache_url(s, *a, blocking=False, **kw):
-        if blocking:
+    def cache_url(s, *a, *, **kw):
+        if 'blocking' in kw and kw['blocking']:
             return s._cache_url_thread(*a, **kw)
         else:
             thr = threading.Thread(target=s._cache_url_thread, args=a, kwargs=kw)
@@ -124,7 +125,6 @@ class Minq_caching_thing:
         with open(verified_file, 'w'):
             pass
         cache_data_thr.join()
-        return content_file
 
     def get_url(s, url, *a, **kw):
         url_dir = s.get_url_dir(url)
