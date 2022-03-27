@@ -47,6 +47,7 @@ class Minq_caching_thing:
         else:
             thr = threading.Thread(target=s._cache_thread, args=a, kwargs=kw)
             thr.start()
+            return thr
     def _cache_thread(s, data, hash_=None):
         if type(data) == str:
             data = data.encode(s.string_encoder)
@@ -54,8 +55,10 @@ class Minq_caching_thing:
             pass
         else:
             assert False
-        hash_ = s.get_bytes_hash(data) if hash_ == None else hash_
+        if hash_ == None:
+            hash_ = s.get_bytes_hash(data)
         hash_dir = os.path.join(s.hashed_bytes_dir, hash_)
+        content_file = os.path.join(hash_dir, s.hash_content_file)
         verification_file = os.path.join(hash_dir, s.hash_is_verified_file)
         if not os.path.isfile(verification_file):
             being_processed_file = os.path.join(s.hashed_bytes_dir, s.hash_is_being_processed_file)
@@ -65,18 +68,18 @@ class Minq_caching_thing:
                 if last_modified + s.hash_is_being_processed_file_lifespan_limit < now:
                     os.remove(being_processed_file)
                 else:
-                    return
+                    #return
+                    assert False, 'if this ever occurs, please ask the developer to do something about it'
             else:
                 os.makedirs(hash_dir) # this is questionable
             with open(being_processed_file, 'w') as f:
                 pass
-            content_file = os.path.join(hash_dir, s.hash_content_file)
             with open(content_file, 'wb') as f:
                 f.write(data)
             with open(verification_file, 'w') as f:
                 pass
             os.remove(being_processed_file)
-            return content_file
+        return content_file
     
     def get_cache(s, hash_, return_path=False, return_file_obj=False, read_mode=''):
         hash_dir = os.path.join(s.hashed_bytes_dir, hash_)
@@ -96,14 +99,18 @@ class Minq_caching_thing:
         with f as f:
             return f.read()
     
-    def cache_url(s, *a, **kw):
-        thr = threading.Thread(target=s._cache_url_thread, args=a, kwargs=kw)
-        thr.start()
+    def cache_url(s, *a, blocking=False, **kw):
+        if blocking:
+            return _cache_url_thread(*a, **kw)
+        else:
+            thr = threading.Thread(target=s._cache_url_thread, args=a, kwargs=kw)
+            thr.start()
+            return thr
     def _cache_url_thread(s, url, data):
         if type(data) == str:
             data = data.encode(s.string_encoder)
         hash_ = s.get_bytes_hash(data)
-        s.cache(data, hash_=hash_)
+        cache_data_thr = s.cache(data, hash_=hash_)
         url_dir = s.get_url_dir(url)
         verified_file = os.path.join(url_dir, s.url_is_verified_file)
         if os.path.isfile(verified_file):
@@ -116,6 +123,8 @@ class Minq_caching_thing:
             f.write(hash_)
         with open(verified_file, 'w'):
             pass
+        cache_data_thr.join()
+        return content_file
 
     def get_url(s, url, *a, **kw):
         url_dir = s.get_url_dir(url)
