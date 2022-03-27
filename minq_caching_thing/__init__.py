@@ -49,13 +49,12 @@ class Minq_caching_thing:
             thr.start()
             return thr
     def _cache_thread(s, data, hash_=None):
-        match type(data):
-            case str:
-                data = data.encode(s.string_encoder)
-            case bytes:
-                pass
-            case _:
-                assert False
+        if type(data) == bytes:
+            pass
+        elif type(data) == str:
+            data = data.encode(s.string_encoder)
+        else:
+             assert False
         if hash_ == None:
             hash_ = s.get_bytes_hash(data)
         hash_dir = os.path.join(s.hashed_bytes_dir, hash_)
