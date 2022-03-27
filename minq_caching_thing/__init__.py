@@ -43,7 +43,7 @@ class Minq_caching_thing:
 
     def cache(s, *a, blocking=False, **kw):
         if blocking:
-            return _cache_thread(*a, **kw)
+            return s._cache_thread(*a, **kw)
         else:
             thr = threading.Thread(target=s._cache_thread, args=a, kwargs=kw)
             thr.start()
@@ -101,7 +101,7 @@ class Minq_caching_thing:
     
     def cache_url(s, *a, blocking=False, **kw):
         if blocking:
-            return _cache_url_thread(*a, **kw)
+            return s._cache_url_thread(*a, **kw)
         else:
             thr = threading.Thread(target=s._cache_url_thread, args=a, kwargs=kw)
             thr.start()
