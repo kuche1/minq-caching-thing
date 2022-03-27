@@ -100,7 +100,7 @@ class Minq_caching_thing:
         with f as f:
             return f.read()
     
-    def cache_url(s, *a, *, **kw):
+    def cache_url(s, *a, \, **kw):
         if 'blocking' in kw and kw['blocking']:
             return s._cache_url_thread(*a, **kw)
         else:
