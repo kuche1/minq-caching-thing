@@ -50,10 +50,10 @@ class Minq_caching_thing:
             return thr
     def _cache_thread(s, data, hash_=None):
         match type(data):
-            case bytes:
-                pass
             case str:
                 data = data.encode(s.string_encoder)
+            case bytes:
+                pass
             case _:
                 assert False
         if hash_ == None:
@@ -100,8 +100,9 @@ class Minq_caching_thing:
         with f as f:
             return f.read()
     
-    def cache_url(s, *a, **kw):
-        if 'blocking' in kw and kw['blocking']:
+    def cache_url(s, *a, bloacking=False, **kw):
+        kw.update({'blocking':blocking})
+        if blocking:
             return s._cache_url_thread(*a, **kw)
         else:
             thr = threading.Thread(target=s._cache_url_thread, args=a, kwargs=kw)
