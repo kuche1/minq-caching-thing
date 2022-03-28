@@ -43,7 +43,7 @@ class Minq_caching_thing:
 
     def cache(s, *a, blocking=False, **kw):
         if blocking:
-            return s._cache_thread(*a, **kw)
+            s._cache_thread(*a, **kw)
         else:
             thr = threading.Thread(target=s._cache_thread, args=a, kwargs=kw)
             thr.start()
@@ -58,7 +58,6 @@ class Minq_caching_thing:
         if hash_ == None:
             hash_ = s.get_bytes_hash(data)
         hash_dir = os.path.join(s.hashed_bytes_dir, hash_)
-        content_file = os.path.join(hash_dir, s.hash_content_file)
         verification_file = os.path.join(hash_dir, s.hash_is_verified_file)
         if not os.path.isfile(verification_file):
             being_processed_file = os.path.join(s.hashed_bytes_dir, s.hash_is_being_processed_file)
@@ -74,12 +73,12 @@ class Minq_caching_thing:
                 os.makedirs(hash_dir) # this is questionable
             with open(being_processed_file, 'w') as f:
                 pass
+            content_file = os.path.join(hash_dir, s.hash_content_file)
             with open(content_file, 'wb') as f:
                 f.write(data)
             with open(verification_file, 'w') as f:
                 pass
             os.remove(being_processed_file)
-        return content_file
     
     def get_cache(s, hash_, return_path=False, return_file_obj=False, read_mode=''):
         hash_dir = os.path.join(s.hashed_bytes_dir, hash_)
@@ -101,7 +100,7 @@ class Minq_caching_thing:
     
     def cache_url(s, *a, blocking=False, **kw):
         if blocking:
-            return s._cache_url_thread(*a, **kw)
+            s._cache_url_thread(*a, **kw)
         else:
             thr = threading.Thread(target=s._cache_url_thread, args=a, kwargs=kw)
             thr.start()
