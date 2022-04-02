@@ -63,7 +63,7 @@ class Minq_caching_thing:
             being_processed_file = os.path.join(s.hashed_bytes_dir, s.hash_is_being_processed_file)
             if os.path.isfile(being_processed_file): # this is not perfect
                 now = time.time()
-                last_modified = os.path.getmtime(being_processes_file)
+                last_modified = os.path.getmtime(being_processed_file)
                 if last_modified + s.hash_is_being_processed_file_lifespan_limit < now:
                     os.remove(being_processed_file)
                 else:
