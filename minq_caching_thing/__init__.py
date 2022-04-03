@@ -15,7 +15,7 @@ class Minq_caching_thing:
     # files
     hash_is_verified_file = 'hash-is-verified'
     hash_is_being_processed_file = 'hash-is-being-processes'
-    hash_is_being_processed_file_lifespan_limit = 60 * 60 * 5 # in seconds
+    hash_is_being_processed_file_lifespan_limit = 60 * 5 # in seconds
     hash_content_file = 'content'
     url_content_file = 'points-to'
     url_is_verified_file = 'url-is-verified'
@@ -68,7 +68,7 @@ class Minq_caching_thing:
                     os.remove(being_processed_file)
                 else:
                     #return
-                    assert False, 'if this ever occurs, please ask the developer to do something about it'
+                    assert False, f'If this ever occurs, please ask the developer to do something about it. Additional info: file {being_processed_file} exists'
             else:
                 os.makedirs(hash_dir) # this is questionable
             with open(being_processed_file, 'w') as f:
