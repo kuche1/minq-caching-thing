@@ -59,10 +59,8 @@ class Minq_caching_thing:
             hash_ = s.get_bytes_hash(data)
         hash_dir = os.path.join(s.hashed_bytes_dir, hash_)
         verification_file = os.path.join(hash_dir, s.hash_is_verified_file)
-        print(f'DEBUG: {verification_file=}')
         if not os.path.isfile(verification_file):
             being_processed_file = os.path.join(hash_dir, s.hash_is_being_processed_file)
-            print(f'DEBUG: {being_processed_file=}')
             if os.path.isfile(being_processed_file): # this is not perfect
                 now = time.time()
                 last_modified = os.path.getmtime(being_processed_file)
